@@ -80,7 +80,7 @@ function App() {
     try {
         let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
         const payload = { contents: chatHistory };
-        const apiKey = "";
+        const apiKey = "AIzaSyC3hdRj3XzCsYnBcZJf01LwE99yCDo5ykM";
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
         const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
@@ -240,3 +240,4 @@ const AiAssistantModal = ({ onClose, suggestion, isLoading }) => {
 
 export default App;
 
+// AIzaSyC3hdRj3XzCsYnBcZJf01LwE99yCDo5ykM
