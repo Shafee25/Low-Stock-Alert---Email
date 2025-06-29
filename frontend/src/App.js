@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import jsPDF from 'jspdf';
-// import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import './App.css';
 
 // --- Icon Components (using inline SVG for simplicity) ---
