@@ -1,0 +1,239 @@
+Here is the complete, correct, and detailed guide from start to finish, incorporating all the successful steps and solutions we discovered together. This document will serve as a perfect reference for your project.
+
+Definitive Guide: End-to-End Cloud Deployment for the Low-Stock Alert App
+
+This document outlines the complete, step-by-step process to deploy your application to the Microsoft Azure cloud. It covers creating resources, deploying the backend and frontend, and correctly configuring them to work together.
+
+Technology Stack:
+
+Backend: Node.js Azure Function App
+
+Frontend: React App hosted on Azure Storage (Static Website)
+
+Database: Azure Cosmos DB (Serverless)
+
+Phase 1: Creating Your Cloud Infrastructure
+
+First, we will create the foundational Azure resources that will host your application and data.
+
+Step 1.1: Create a Resource Group
+
+This acts as a logical folder for all your project's services.
+
+Navigate to the Azure Portal.
+
+Click + Create a resource.
+
+Search for Resource Group and click Create.
+
+Resource group name: LowStock-RG-group4
+
+Region: Choose a region near you (e.g., East US).
+
+Click Review + create, then Create.
+
+Step 1.2: Create the Cosmos DB Database
+
+This will be your live cloud database.
+
+In the Azure Portal, click + Create a resource.
+
+Search for Azure Cosmos DB and click Create.
+
+On the API selection screen, find the Core (SQL) option and click Create.
+
+Fill in the creation form:
+
+Resource Group: Select LowStock-RG-group4.
+
+Account Name: low-stock-db-group4 (This must be globally unique).
+
+Location: Choose the same region as your resource group.
+
+Capacity mode: Serverless. This is crucial for using the free tier effectively.
+
+Click Review + create, then Create. (This may take 5-10 minutes).
+
+Get Connection String: Once deployed, navigate to the resource. Go to the Keys menu and copy the PRIMARY CONNECTION STRING. Paste this into a temporary text file.
+
+Create Database and Containers:
+
+In the resource menu, go to Data Explorer.
+
+Click New Container -> New Database. Set Database id to ShopInventory and click OK.
+
+With ShopInventory selected, click New Container.
+
+Container id: Products
+
+Partition key: /id
+
+Click OK.
+
+Click New Container again.
+
+Container id: LowStockReports
+
+Partition key: /id
+
+Click OK.
+
+Phase 2: Deploying the Backend Function App
+
+Now we will publish your backend code and configure it.
+
+Step 2.1: Deploy the Code from VS Code
+
+Open your project in Visual Studio Code.
+
+Click the Azure icon in the left-hand Activity Bar.
+
+In the Functions section, click the Deploy to Function App... cloud icon.
+
+Answer the series of prompts that appear at the top of the screen:
+
+Folder to deploy: Select your backend folder.
+
+Subscription: Choose your Azure for Students subscription.
+
+Select Function App: + Create new Function App in Azure... (Advanced).
+
+Globally unique name: low-stock-api-group4
+
+Runtime stack: Node.js 18 LTS.
+
+Hosting plan: Flex Consumption.
+
+Instance memory size: 512.
+
+OS: Linux.
+
+Resource authentication type: Secrets.
+
+Resource Group: LowStock-RG-group4.
+
+Storage Account: + Create new storage account. Name it lowstockstoragegroup4.
+
+Application Insights: Skip for now.
+
+The deployment will now begin.
+
+Step 2.2: Configure Backend Application Settings
+
+This step connects your backend code to your database and email service.
+
+In the Azure Portal, navigate to your new Function App: low-stock-api-group4.
+
+In the left menu, go to Settings -> Configuration.
+
+Under Application settings, click + New application setting to add each of the following (names must be exact):
+
+COSMOS_DB_CONNECTION: Paste the PRIMARY CONNECTION STRING you copied earlier.
+
+COSMOS_DB_DATABASE: ShopInventory
+
+COSMOS_DB_PRODUCTS_CONTAINER: Products
+
+COSMOS_DB_REPORTS_CONTAINER: LowStockReports
+
+SENDGRID_API_KEY: Paste your actual SendGrid API key.
+
+SENDGRID_TO_EMAIL: 19ict005@seu.ac.lk
+
+SENDGRID_FROM_EMAIL: 19ict005@seu.ac.lk
+
+Click Save at the top. The application will restart with the new settings.
+
+Phase 3: Preparing and Deploying the Frontend
+
+This phase involves building the frontend with the correct cloud API address and uploading it.
+
+Step 3.1: Get the Correct Backend URL
+
+In the Azure Portal, navigate to your low-stock-api-group4 Function App.
+
+Go to the Functions menu and click on the GetProducts function.
+
+At the top, click </> Get Function Url and copy the entire URL.
+
+Paste it into a text file. The correct Base URL is the part before /GetProducts. It will be: https://low-stock-api-group4.azurewebsites.net/api
+
+Step 3.2: Re-build the React App with the Correct URL
+
+In VS Code, open the file frontend/.env.
+
+Replace its entire content with this single line, using the Base URL from the previous step:
+
+Generated code
+REACT_APP_API_BASE_URL=https://low-stock-api-group4.azurewebsites.net/api
+
+
+Save the file.
+
+Open a terminal in VS Code, navigate to the frontend directory (cd frontend), and run the build command:
+
+Generated bash
+npm run build
+IGNORE_WHEN_COPYING_START
+content_copy
+download
+Use code with caution.
+Bash
+IGNORE_WHEN_COPYING_END
+
+This creates a new, updated build folder with the correct cloud URL embedded in it.
+
+Step 3.3: Configure and Deploy to Azure Storage
+
+In the Azure Portal, navigate to your storage account: lowstockstoragegroup4.
+
+Upgrade Account (If Necessary): In the Configuration menu, if you see an "Upgrade" link, click it to upgrade the account to "General Purpose v2".
+
+Enable Static Website: In the left menu, find the Data management section and click Static website.
+
+Toggle it to Enabled.
+
+Set Index document name: index.html.
+
+Set Error document path: index.html.
+
+Click Save.
+
+Copy the Primary endpoint URL. This is your public website address.
+
+Upload the Frontend:
+
+In VS Code, go to the Azure extension -> STORAGE panel.
+
+Navigate to your lowstockstoragegroup4 account -> Blob Containers.
+
+Right-click the $web container and select Upload Files....
+
+In the file explorer, navigate inside the frontend/build folder.
+
+Select all files and folders (Ctrl+A or Cmd+A).
+
+Click Upload.
+
+Phase 4: Final Connection and Verification
+
+This is the final step that allows the frontend and backend to communicate.
+
+Step 4.1: Configure Backend CORS
+
+In the Azure Portal, navigate back to your Function App: low-stock-api-group4.
+
+In the left menu, under the API section, click CORS.
+
+In the "Allowed Origins" box, add a new line and paste the Primary endpoint URL you copied from your storage account's static website settings. Make sure there is no / at the end.
+
+Click Save.
+
+Step 4.2: View Your Live Application
+
+Open a web browser and navigate to your Primary endpoint URL:
+https://lowstockstoragegroup4.z13.web.core.windows.net/
+
+Perform a hard refresh (Ctrl+F5 or Cmd+Shift+R) to ensure you see the latest version.
+
+Your application is now fully deployed and live on the Azure cloud. Congratulations
